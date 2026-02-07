@@ -56,6 +56,13 @@ interface IAnalyzersState {
     energyMeasure: EnergyMeasure;
   };
 }
+interface IValentineState {
+  currentPhase: "proposal" | "visual-journey" | "complete";
+  noButtonAttempts: number;
+  yesButtonClicked: boolean;
+  audioTime: number;
+  isValentineMode: boolean;
+}
 
 interface IAppState {
   user: {
@@ -68,6 +75,7 @@ interface IAppState {
   mappers: IMappersState;
   audio: IAudioState;
   analyzers: IAnalyzersState;
+  valentine: IValentineState;
   actions: {
     setMode: (newMode: TApplicationMode) => void;
     setAudio: (newAudio: Partial<IAudioState>) => void;
@@ -78,6 +86,11 @@ interface IAppState {
     nextPalette: () => void;
     setMappers: (newMappers: Partial<IMappersState>) => void;
     setAnalyzerFFT: (newAnalyzer: Partial<IAnalyzersState["fft"]>) => void;
+    setValentinePhase: (phase: IValentineState["currentPhase"]) => void;
+    incrementNoAttempts: () => void;
+    setYesClicked: (clicked: boolean) => void;
+    updateAudioTime: (time: number) => void;
+    initValentineMode: () => void;
   };
 }
 
@@ -113,6 +126,13 @@ const useAppState = create<IAppState>((set) => ({
   },
   audio: {
     source: getPlatformSupportedAudioSources()[0],
+  },
+  valentine: {
+    currentPhase: "proposal",
+    noButtonAttempts: 0,
+    yesButtonClicked: false,
+    audioTime: 0,
+    isValentineMode: false,
   },
   actions: {
     setVisual: (newVisualId: TVisualId) =>
@@ -222,6 +242,48 @@ const useAppState = create<IAppState>((set) => ({
           },
         },
       })),
+    setValentinePhase: (phase: IValentineState["currentPhase"]) =>
+      set((state) => ({
+        valentine: {
+          ...state.valentine,
+          currentPhase: phase,
+        },
+      })),
+    incrementNoAttempts: () =>
+      set((state) => ({
+        valentine: {
+          ...state.valentine,
+          noButtonAttempts: state.valentine.noButtonAttempts + 1,
+        },
+      })),
+    setYesClicked: (clicked: boolean) =>
+      set((state) => ({
+        valentine: {
+          ...state.valentine,
+          yesButtonClicked: clicked,
+        },
+      })),
+    updateAudioTime: (time: number) =>
+      set((state) => ({
+        valentine: {
+          ...state.valentine,
+          audioTime: time,
+        },
+      })),
+    initValentineMode: () =>
+      set((state) => ({
+        valentine: {
+          ...state.valentine,
+          isValentineMode: true,
+          currentPhase: "proposal",
+        },
+        mode: APPLICATION_MODE.AUDIO,
+        appearance: {
+          ...state.appearance,
+          palette: COLOR_PALETTE.THREE_COOL_TO_WARM,
+          paletteTrackEnergy: true,
+        },
+      })),
   },
 }));
 
@@ -236,3 +298,4 @@ export const useUser = () => useAppState((state) => state.user);
 export const useMappers = () => useAppState((state) => state.mappers);
 export const useAudio = () => useAppState((state) => state.audio);
 export const useAppStateActions = () => useAppState((state) => state.actions);
+export const useValentineState = () => useAppState((state) => state.valentine);

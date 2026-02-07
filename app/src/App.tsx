@@ -7,6 +7,7 @@ import {
   APPLICATION_MODE,
   type TApplicationMode,
 } from "@/lib/applicationModes";
+import ValentineApp from "@/ValentineApp";
 
 import { useAppStateActions, useMode } from "./lib/appState";
 
@@ -41,6 +42,16 @@ const getCanvasComponent = (mode: TApplicationMode) => {
 const App = () => {
   const mode = useMode();
   const { noteCanvasInteraction } = useAppStateActions();
+
+  // Check if Valentine mode is requested via query parameter
+  const isValentineMode = new URLSearchParams(window.location.search).get(
+    "valentine"
+  ) === "true";
+
+  // Render Valentine proposal if requested
+  if (isValentineMode) {
+    return <ValentineApp />;
+  }
 
   return (
     <main className="relative h-[100dvh] w-[100dvw] bg-black">

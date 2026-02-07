@@ -9,6 +9,7 @@ import {
 } from "@/components/audio/sourceControls/common";
 import MicrophoneAudioControls from "@/components/audio/sourceControls/mic";
 import ScreenShareControls from "@/components/audio/sourceControls/screenshare";
+import ValentineAudioPlayer from "@/components/audio/sourceControls/valentine";
 import {
   useMediaStreamLink,
   type TAnalyzerInputControl,
@@ -16,7 +17,7 @@ import {
 import FFTAnalyzer from "@/lib/analyzers/fft";
 import ScopeAnalyzer from "@/lib/analyzers/scope";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
-import { useAudio } from "@/lib/appState";
+import { useAudio, useValentineState } from "@/lib/appState";
 
 import { AudioScopeAnalyzerControls } from "./scopeAnalyzerControls";
 
@@ -29,9 +30,12 @@ const buildScopeAnalyzer = () => {
   };
 };
 
-const buildFFTAnalyzer = (volume: number) => {
+const buildFFTAnalyzer = (volume: number, audioSource: TAudioSource) => {
+  // Always create new audio and context for normal app operation
+  // Only use global for file uploads/soundcloud when explicitly needed (Valentine mode)
   const audioCtx = buildAudioContext();
   const audio = buildAudio();
+  
   return {
     audio,
     analyzer: new FFTAnalyzer(audio, audioCtx, volume),
@@ -95,7 +99,10 @@ const ControlledAnalyzer = ({
   const { audio, analyzer } = useMemo(() => {
     switch (mode) {
       case APPLICATION_MODE.AUDIO:
-        return buildFFTAnalyzer(isMediaStream(audioSource) ? 0.0 : 1.0);
+        return buildFFTAnalyzer(
+          isMediaStream(audioSource) ? 0.0 : 1.0,
+          audioSource
+        );
       case APPLICATION_MODE.AUDIO_SCOPE:
         return buildScopeAnalyzer();
       default:
@@ -126,14 +133,51 @@ const ControlledAnalyzer = ({
   );
 };
 
+const ValentineAnalyzer = ({
+  mode,
+}: {
+  mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
+}) => {
+  const { audio, analyzer } = useMemo(() => {
+    switch (mode) {
+      case APPLICATION_MODE.AUDIO:
+        return buildFFTAnalyzer(1.0, AUDIO_SOURCE.FILE_UPLOAD);
+      case APPLICATION_MODE.AUDIO_SCOPE:
+        return buildScopeAnalyzer();
+      default:
+        return mode satisfies never;
+    }
+  }, [mode]);
+
+  return (
+    <>
+      <ValentineAudioPlayer audio={audio} />
+      {analyzer instanceof FFTAnalyzer ? (
+        <FFTAnalyzerControls analyzer={analyzer} />
+      ) : analyzer instanceof ScopeAnalyzer ? (
+        <AudioScopeAnalyzerControls analyzer={analyzer} />
+      ) : (
+        (analyzer satisfies never)
+      )}
+    </>
+  );
+};
+
 const AudioAnalyzer = ({
   mode,
 }: {
   mode: typeof APPLICATION_MODE.AUDIO | typeof APPLICATION_MODE.AUDIO_SCOPE;
 }) => {
   const { source } = useAudio();
+  const { currentPhase } = useValentineState();
+  const isValentineMode =
+    currentPhase === "visual-journey" || currentPhase === "complete";
 
-  return <ControlledAnalyzer mode={mode} audioSource={source} />;
+  return isValentineMode ? (
+    <ValentineAnalyzer mode={mode} />
+  ) : (
+    <ControlledAnalyzer mode={mode} audioSource={source} />
+  );
 };
 
 export default AudioAnalyzer;
