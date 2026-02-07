@@ -1,0 +1,5 @@
+.env
+.vscode/
+scratch.sh
+scratch/
+notes/
