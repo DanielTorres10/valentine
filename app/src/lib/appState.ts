@@ -299,3 +299,4 @@ export const useMappers = () => useAppState((state) => state.mappers);
 export const useAudio = () => useAppState((state) => state.audio);
 export const useAppStateActions = () => useAppState((state) => state.actions);
 export const useValentineState = () => useAppState((state) => state.valentine);
+export { useAppState };

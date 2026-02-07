@@ -4,7 +4,7 @@ import ProposalScreen from "@/components/proposal/ProposalScreen";
 import Visual3DCanvas from "@/components/canvas/Visual3D";
 import TimedReveals from "@/components/reveals/TimedReveals";
 import { APPLICATION_MODE } from "@/lib/applicationModes";
-import { useValentineState, useAppStateActions, useAudio } from "@/lib/appState";
+import { useValentineState, useAppStateActions } from "@/lib/appState";
 import AudioAnalyzer from "@/components/analyzers/audioAnalyzer";
 import { useValentineAudioContext } from "@/context/valentineAudio";
 
@@ -15,11 +15,7 @@ export const ValentineApp = ({
   const { setValentinePhase, setMode, initValentineMode, updateAudioTime } =
     useAppStateActions();
   const { setAudioUrl } = useValentineAudioContext();
-  const audioRefContainer = useRef<{ audio: HTMLAudioElement | null }>({
-    audio: null,
-  });
-  const [, setAudioRef] = useState<HTMLAudioElement | null>(null);
-  const { source: audioSource } = useAudio();
+  const audioStartTimeRef = useRef<number | null>(null);
 
   // Initialize Valentine mode
   useEffect(() => {
@@ -27,35 +23,30 @@ export const ValentineApp = ({
     setMode(APPLICATION_MODE.AUDIO);
   }, [initValentineMode, setMode]);
 
-  // Track audio time for reveals - use the audio element from the analyzer
+  // Track elapsed time for reveals using a timer instead of audio.currentTime
   useEffect(() => {
-    // Find the audio element created by AudioAnalyzer
-    const audioElement =
-      audioRefContainer.current.audio ||
-      document.querySelector("audio") as HTMLAudioElement;
+    if (currentPhase !== "visual-journey" && currentPhase !== "complete") {
+      return;
+    }
 
-    if (!audioElement) return;
-
-    const checkAudioTime = () => {
-      updateAudioTime(audioElement.currentTime);
-      if (audioElement.ended && currentPhase === "visual-journey") {
-        setValentinePhase("complete");
+    const elapsedInterval = setInterval(() => {
+      if (audioStartTimeRef.current === null) {
+        return;
       }
-    };
 
-    const interval = setInterval(checkAudioTime, 100);
-    return () => clearInterval(interval);
-  }, [currentPhase, updateAudioTime, setValentinePhase]);
+      const elapsedSeconds =
+        (Date.now() - audioStartTimeRef.current) / 1000;
+      updateAudioTime(elapsedSeconds);
+    }, 100);
+
+    return () => clearInterval(elapsedInterval);
+  }, [currentPhase, updateAudioTime]);
 
   const handleProposalComplete = () => {
-    console.log("[Valentine] Proposal complete, playing audio");
+    // Record when audio will start playing
+    audioStartTimeRef.current = Date.now();
     // Set audio URL in context - ValentineAudioPlayer will handle playback
     setAudioUrl(harryStylesAudioPath);
-  };
-
-  const handleAudioRef = (audio: HTMLAudioElement) => {
-    audioRefContainer.current.audio = audio;
-    setAudioRef(audio);
   };
 
   return (
@@ -68,11 +59,8 @@ export const ValentineApp = ({
       {/* Phase 2 & 3: Visual Journey with Audio and Reveals */}
       {(currentPhase === "visual-journey" || currentPhase === "complete") && (
         <>
-          {/* Audio Analyzer - capture its audio element */}
-          <AudioAnalyzerWrapper
-            mode={APPLICATION_MODE.AUDIO}
-            onAudioRef={handleAudioRef}
-          />
+          {/* Audio Analyzer */}
+          <AudioAnalyzer mode={APPLICATION_MODE.AUDIO} />
 
           {/* 3D Visualization Canvas */}
           <div className="absolute inset-0 z-0">
@@ -101,31 +89,6 @@ export const ValentineApp = ({
       )}
     </main>
   );
-};
-
-// Wrapper to capture the audio element from AudioAnalyzer
-const AudioAnalyzerWrapper = ({
-  mode,
-  onAudioRef,
-}: {
-  mode: typeof APPLICATION_MODE.AUDIO;
-  onAudioRef: (audio: HTMLAudioElement) => void;
-}) => {
-  useEffect(() => {
-    // Find the audio element created by AudioAnalyzer and notify parent
-    const findAudio = () => {
-      const audio = document.querySelector("audio") as HTMLAudioElement;
-      if (audio) {
-        onAudioRef(audio);
-      } else {
-        // Retry if not found yet
-        setTimeout(findAudio, 100);
-      }
-    };
-    findAudio();
-  }, [onAudioRef]);
-
-  return <AudioAnalyzer mode={mode} />;
 };
 
 export default ValentineApp;

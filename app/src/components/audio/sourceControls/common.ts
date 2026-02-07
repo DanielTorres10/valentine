@@ -44,7 +44,6 @@ export const getPlatformSupportedAudioSources = (): TAudioSource[] => {
 };
 
 export const buildAudio = () => {
-  console.log("Building audio...");
   const out = new Audio();
   out.crossOrigin = "anonymous";
   return out;

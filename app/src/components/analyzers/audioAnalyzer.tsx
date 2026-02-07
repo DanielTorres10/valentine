@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { FFTAnalyzerControls } from "@/components/analyzers/fftAnalyzerControls";
 import { ControlledAudioSource } from "@/components/audio/audioSource";
 import {
@@ -148,6 +148,13 @@ const ValentineAnalyzer = ({
         return mode satisfies never;
     }
   }, [mode]);
+
+  // Store audio in window for discovery by ValentineApp
+  useEffect(() => {
+    if (audio) {
+      (window as any).__valentineAudio = audio;
+    }
+  }, [audio]);
 
   return (
     <>

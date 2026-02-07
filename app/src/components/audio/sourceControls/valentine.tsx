@@ -11,8 +11,6 @@ const ValentineAudioPlayer = ({ audio }: AudioSourceControlsProps) => {
     const { config: { audioUrl } } = useValentineAudioContext();
     const [isPlaying, setIsPlaying] = useState(false);
 
-    console.log("[ValentineAudioPlayer] Rendering with audio:", !!audio, "url:", audioUrl?.substring(0, 50) || "none");
-
     // Handle URL changes - set src and play
     useEffect(() => {
       if (!audioUrl) {
@@ -20,16 +18,11 @@ const ValentineAudioPlayer = ({ audio }: AudioSourceControlsProps) => {
           audio.pause();
           setIsPlaying(false);
         }
-        console.log("[ValentineAudioPlayer] No URL set");
         return;
       }
 
-      console.log("[ValentineAudioPlayer] URL changed:", audioUrl.substring(0, 50));
-      console.log("[ValentineAudioPlayer] Audio element:", !!audio);
-      
       // Set the source directly (no need to createObjectURL)
       audio.src = audioUrl;
-      console.log("[ValentineAudioPlayer] Set audio.src to:", audioUrl);
 
       // Try to auto-play
       const playPromise = audio.play();
@@ -37,10 +30,8 @@ const ValentineAudioPlayer = ({ audio }: AudioSourceControlsProps) => {
         playPromise
           .then(() => {
             setIsPlaying(true);
-            console.log("[ValentineAudioPlayer] ✅ Now playing");
           })
           .catch((err) => {
-            console.warn("[ValentineAudioPlayer] ⚠️ Auto-play prevented:", err.message);
             setIsPlaying(false);
           });
       }
@@ -50,17 +41,14 @@ const ValentineAudioPlayer = ({ audio }: AudioSourceControlsProps) => {
     useEffect(() => {
       const handlePlay = () => {
         setIsPlaying(true);
-        console.log("[ValentineAudioPlayer] Playing");
       };
 
       const handlePause = () => {
         setIsPlaying(false);
-        console.log("[ValentineAudioPlayer] Paused");
       };
 
       const handleEnded = () => {
         setIsPlaying(false);
-        console.log("[ValentineAudioPlayer] Ended");
       };
 
       audio.addEventListener("play", handlePlay);
@@ -76,7 +64,6 @@ const ValentineAudioPlayer = ({ audio }: AudioSourceControlsProps) => {
 
     return <></>;
   } catch (error) {
-    console.error("[ValentineAudioPlayer] Error:", error);
     return null;
   }
 };
