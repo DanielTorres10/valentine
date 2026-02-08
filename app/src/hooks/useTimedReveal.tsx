@@ -2,14 +2,10 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import useTimedReveal from "@/hooks/useTimedReveal";
 import useLetterReveal from "@/hooks/useLetterReveal";
 
-const dateTimeRevealTime = 30; // seconds
-const locationRevealTime = 60; // seconds
-const eventRevealTime = 121;
-
 export const DateReveal = () => {
-  const isVisible = useTimedReveal(dateTimeRevealTime); // 10 seconds
+  const isVisible = useTimedReveal(30); // 10 seconds
   const dateText = "October 21, 2026";
-  const revealedText = useLetterReveal(dateTimeRevealTime, dateText, 17);
+  const revealedText = useLetterReveal(30, dateText, 17);
 
   return (
     <div
@@ -38,9 +34,9 @@ export const DateReveal = () => {
 };
 
 export const LocationReveal = () => {
-  const isVisible = useTimedReveal(locationRevealTime); // 15 seconds
+  const isVisible = useTimedReveal(60); // 15 seconds
   const locationText = "New York: Madison Square Garden";
-  const revealedText = useLetterReveal(locationRevealTime, locationText, 17);
+  const revealedText = useLetterReveal(60, locationText, 17);
 
   return (
     <div
@@ -68,10 +64,10 @@ export const LocationReveal = () => {
 };
 
 export const EventReveal = ({ imageUrl }: { imageUrl?: string }) => {
-  const isVisible = useTimedReveal(eventRevealTime); // Text appears at 121 seconds
+  const isVisible = useTimedReveal(121); // Text appears at 121 seconds
   const eventText = "Harry Styles: TOGETHER, TOGETHER";
-  const revealedText = useLetterReveal(eventRevealTime, eventText, 15); // Reveal over 15 seconds
-  const imageVisible = useTimedReveal(eventRevealTime + 15); // Image appears after text finishes (121 + 15)
+  const revealedText = useLetterReveal(121, eventText, 15); // Reveal over 15 seconds
+  const imageVisible = useTimedReveal(136); // Image appears after text finishes (121 + 15)
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });

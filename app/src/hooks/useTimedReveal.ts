@@ -1,18 +1,42 @@
-import { useEffect, useState } from "react";
-import { useAppState } from "@/lib/appState";
+// Updated useTimedReveal.tsx
+import { useState, useEffect, useRef } from 'react';
 
-export const useTimedReveal = (triggerTime: number) => {
+const useTimedReveal = (triggerTime: number, dependencies: any[] = []) => {
   const [isVisible, setIsVisible] = useState(false);
-  const audioTime = useAppState((state) => state.valentine.audioTime);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    if (audioTime >= triggerTime && !isVisible) {
-      setIsVisible(true);
-    }
-  }, [audioTime, triggerTime, isVisible]);
+    isMountedRef.current = true;
+    
+    const checkAudioTime = () => {
+      // Get audio element from window or app state
+      const audioElement = (window as any).__valentineAudio as HTMLAudioElement;
+      if (!audioElement || !audioElement.currentTime) {
+        return 0;
+      }
+      return audioElement.currentTime;
+    };
+
+    const checkVisibility = () => {
+      if (!isMountedRef.current) return;
+      
+      const currentTime = checkAudioTime();
+      setIsVisible(currentTime >= triggerTime);
+    };
+
+    // Check initially
+    checkVisibility();
+    
+    // Set up interval to check (more frequent for better accuracy)
+    const intervalId = setInterval(checkVisibility, 100);
+    
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(intervalId);
+    };
+  }, [triggerTime, ...dependencies]);
 
   return isVisible;
 };
 
 export default useTimedReveal;
-

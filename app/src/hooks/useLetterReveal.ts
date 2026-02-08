@@ -1,27 +1,59 @@
-import { useEffect, useState } from "react";
-import { useAppState } from "@/lib/appState";
+import { useState, useEffect, useRef } from 'react';
 
-export const useLetterReveal = (
-  triggerTime: number,
-  text: string,
-  revealDurationSeconds: number = 30
-) => {
-  const [revealedLetters, setRevealedLetters] = useState(0);
-  const audioTime = useAppState((state) => state.valentine.audioTime);
+const useLetterReveal = (triggerTime: number, text: string, revealDuration: number) => {
+  const [revealedLength, setRevealedLength] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    if (audioTime >= triggerTime) {
-      // Calculate how many letters to show based on time elapsed since trigger
-      const timeElapsed = audioTime - triggerTime;
-      // Reveal letters evenly across the reveal duration
-      const lettersToShow = Math.floor(
-        (timeElapsed / revealDurationSeconds) * text.length
-      ) + 1;
-      setRevealedLetters(Math.min(lettersToShow, text.length));
-    }
-  }, [audioTime, triggerTime, text.length, revealDurationSeconds]);
+    isMountedRef.current = true;
+    
+    return () => {
+      isMountedRef.current = false;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
-  return text.substring(0, revealedLetters);
+  useEffect(() => {
+    // Clear any existing timers
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    
+    // Reset revealed length
+    setRevealedLength(0);
+
+    // Start revealing after triggerTime
+    timerRef.current = setTimeout(() => {
+      if (!isMountedRef.current) return;
+      
+      const lettersPerInterval = Math.max(1, Math.floor(text.length / (revealDuration * 10)));
+      let currentLength = 0;
+      
+      intervalRef.current = setInterval(() => {
+        if (!isMountedRef.current) return;
+        
+        currentLength += lettersPerInterval;
+        if (currentLength >= text.length) {
+          currentLength = text.length;
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }
+        
+        setRevealedLength(currentLength);
+      }, 100); // Update every 100ms for smooth reveal
+    }, triggerTime * 1000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [triggerTime, text, revealDuration]);
+
+  return text.substring(0, revealedLength);
 };
 
 export default useLetterReveal;
