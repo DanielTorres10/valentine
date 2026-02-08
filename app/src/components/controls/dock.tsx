@@ -24,7 +24,7 @@ export const SettingsPanelTrigger = () => {
       </DockItem>
       {isSmallScreen ? (
         <MobileDrawer open={open} onOpenChange={setOpen}>
-          <ModeSheetContent />
+          {/* <ModeSheetContent /> */}
           <VisualSettingsSheetContent />
         </MobileDrawer>
       ) : (
@@ -34,7 +34,7 @@ export const SettingsPanelTrigger = () => {
             side="right"
             className="no-scrollbar w-full max-w-full space-y-4 overflow-scroll bg-background/70 p-4 pt-16 sm:w-[430px] sm:max-w-[430px]"
           >
-            <ModeSheetContent />
+            {/* <ModeSheetContent /> */}
             <VisualSettingsSheetContent />
           </SheetContent>
         </Sheet>
@@ -101,7 +101,7 @@ export const ApplicationDock = () => {
     <div className="pointer-events-none absolute bottom-0 flex w-full items-end justify-center gap-4 p-4">
       <div className="pointer-events-none h-fit overflow-hidden bg-transparent sm:max-w-[60%]">
         <div className="pointer-events-auto flex h-full w-full snap-x snap-mandatory flex-row items-center justify-start gap-4 overflow-auto rounded-xl bg-gradient-to-t from-white/10 to-white/0 p-4 shadow-inner">
-          <VisualSelector />
+          {/* <VisualSelector /> */}
           <SettingsPanelTrigger />
         </div>
       </div>

@@ -179,13 +179,6 @@ export const ValentineApp = ({
           {/* Audio Analyzer */}
           <AudioAnalyzer mode={APPLICATION_MODE.AUDIO} />
 
-          <div className="flex items-center justify-between gap-2">
-            <Label>Colors Follow Music</Label>
-            <Switch
-              defaultChecked={paletteTrackEnergy}
-              onCheckedChange={(e) => setAppearance({ paletteTrackEnergy: e })}/>
-          </div>
-
           {/* Timed Text Reveals */}
           <TimedReveals imageUrl="/r3f-audio-visualizer/images/harry-styles-together.png" />
 
