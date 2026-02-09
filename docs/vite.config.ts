@@ -4,7 +4,6 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // Set base for GitHub Pages
   base: '/r3f-audio-visualizer/',
   
   plugins: [react()],
@@ -14,7 +13,8 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist', // Changed from 'docs' to 'dist'
+    outDir: 'dist',
+    emptyOutDir: true,
     sourcemap: false,
     rollupOptions: {
       output: {
@@ -29,5 +29,10 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+  },
+  preview: {
+    port: 3000,
+    host: true,
+    strictPort: true,
   },
 })

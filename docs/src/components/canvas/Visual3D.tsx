@@ -83,12 +83,10 @@ const WebGLContextHandler = () => {
       console.error("[WebGL] WebGL error:", event);
     };
 
-    canvas.addEventListener("webglcontextcreationerror", handleWebGLError, false);
 
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       canvas.removeEventListener("webglcontextrestored", handleContextRestored);
-      canvas.removeEventListener("webglcontextcreationerror", handleWebGLError);
     };
   }, [gl]);
 
