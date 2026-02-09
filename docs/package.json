@@ -3,20 +3,13 @@
   "homepage": "https://danieltorres10.github.io/r3f-audio-visualizer/",
   "version": "0.2.0",
   "private": true,
-  "scripts": {
-    "dev": "vite",
-    "mobile": "vite --host",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
-    "format": "prettier --check \"**/*.{js,cjs,mjs,ts,tsx,md,json}\"",
-    "format:fix": "prettier --write \"**/*.{js,cjs,mjs,ts,tsx,md,json}\"",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "deploy-docs": "npm run build && gh-pages -d docs"
-  },
+"scripts": {
+  "dev": "vite",
+  "build": "tsc && vite build",
+  "preview": "vite preview",
+  "deploy": "node deploy-simple.js",
+  "deploy:force": "rm -rf dist && npm run build && npx gh-pages -d dist --dotfiles --force"
+},
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
@@ -53,11 +46,11 @@
     "@eslint/js": "^9.39.2",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@types/eslint": "^9.6.1",
-    "@types/node": "^22.0.0",
-    "@types/react": "^18.3.9",
-    "@types/react-dom": "^18.3.0",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
     "@types/three": "^0.161.2",
-    "@vitejs/plugin-react": "^5.1.2",
+    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.23",
     "eslint": "^9.39.2",
     "eslint-plugin-import": "^2.32.0",
@@ -66,12 +59,12 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "gh-pages": "^6.3.0",
     "jiti": "^2.6.1",
-    "postcss": "^8.5.6",
+    "postcss": "^8.4.35",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "0.7.2",
-    "tailwindcss": "^3.4.15",
-    "typescript": "5.9.3",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
     "typescript-eslint": "^8.53.1",
-    "vite": "^7.3.1"
+    "vite": "^5.1.0"
   }
 }
